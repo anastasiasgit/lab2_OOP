@@ -1,0 +1,129 @@
+import datetime
+
+
+class Student:
+    def __init__(self, first_name, last_name, email, enrollment_date, date_of_birth):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.enrollment_date = enrollment_date
+        self.date_of_birth = date_of_birth
+
+
+class Faculty:
+    def __init__(self, name, abbreviation, study_field):
+        self.name = name
+        self.abbreviation = abbreviation
+        self.students = []  
+        self.study_field = study_field
+
+   
+    def add_student(self, student):
+        self.students.append(student)
+
+   
+    def graduate_student(self, student_email):
+        self.students = [student for student in self.students if student.email != student_email]
+
+   
+    def is_student_in_faculty(self, student_email):
+        return any(student.email == student_email for student in self.students)
+
+
+class StudyField:
+    MECHANICAL_ENGINEERING = "Inginerie Mecanică"
+    SOFTWARE_ENGINEERING = "Inginerie Software"
+    FOOD_TECHNOLOGY = "Tehnologie Alimentară"
+    URBANISM_ARCHITECTURE = "Urbanism și Arhitectură"
+    VETERINARY_MEDICINE = "Medicină Veterinară"
+
+
+class StudentManagementSystem:
+    def __init__(self):
+        self.university_faculties = [] 
+
+    
+    def create_faculty(self, name, abbreviation, study_field):
+        faculty = Faculty(name, abbreviation, study_field)
+        self.university_faculties.append(faculty)
+        return faculty
+
+    
+    def search_faculty_by_student_identifier(self, student_identifier):
+        for faculty in self.university_faculties:
+            if faculty.is_student_in_faculty(student_identifier):
+                return faculty
+        return None
+
+   
+    def display_all_university_faculties(self):
+        for faculty in self.university_faculties:
+            print(f"Facultate: {faculty.name}, Abreviere: {faculty.abbreviation}, Domeniu de studiu: {faculty.study_field}")
+
+
+sms = StudentManagementSystem()
+
+
+def display_menu():
+    print("Bine ati venit! Sistemul manage al UTM va prezinta")
+    print("\nMeniu:")
+    print("1. Creare Facultate")
+    print("2. Adăugare Student la Facultate")
+    print("3. Absolvire Student din Facultate")
+    print("4. Afișare Toate Facultățile")
+    print("5. Căutare Facultate după Identificator Student")
+    print("6. Ieșire")
+
+
+while True:
+    display_menu()
+    choice = input("Introduceți opțiunea: ")
+
+    if choice == '1':
+        name = input("Introduceți Numele Facultății: ")
+        abbreviation = input("Introduceți Abrevierea Facultății: ")
+        field = input("Introduceți Domeniul de Studiu: ")
+        sms.create_faculty(name, abbreviation, field)
+        print("Facultate creată cu succes.")
+
+    elif choice == '2':
+        email = input("Introduceți Email Student: ")
+        faculty_abbreviation = input("Introduceți Abrevierea Facultății: ")
+        faculty = next((f for f in sms.university_faculties if f.abbreviation == faculty_abbreviation), None)
+        if faculty:
+            student = Student(input("Introduceți Prenumele: "), input("Introduceți Numele de Familie: "), email,
+                              datetime.date.today(), datetime.date(2000, 1, 1))
+            faculty.add_student(student)
+            print("Student adăugat la Facultate.")
+
+        else:
+            print("Facultatea nu a fost găsită.")
+
+    elif choice == '3':
+        email = input("Introduceți Email Student: ")
+        faculty_abbreviation = input("Introduceți Abrevierea Facultății: ")
+        faculty = next((f for f in sms.university_faculties if f.abbreviation == faculty_abbreviation), None)
+        if faculty:
+            faculty.graduate_student(email)
+            print("Student absolvit din Facultate.")
+
+        else:
+            print("Facultatea nu a fost găsită.")
+
+    elif choice == '4':
+        sms.display_all_university_faculties()
+
+    elif choice == '5':
+        email = input("Introduceți Email sau ID Student: ")
+        faculty = sms.search_faculty_by_student_identifier(email)
+        if faculty:
+            print(f"Studentul aparține Facultății {faculty.name}.")
+        else:
+            print("Studentul nu a fost găsit sau nu este înscriși în nicio facultate.")
+
+    elif choice == '6':
+        print("Ieșire din program. La revedere!")
+        break
+
+    else:
+        print("Opțiune invalidă. Vă rugăm să încercați din nou.")
